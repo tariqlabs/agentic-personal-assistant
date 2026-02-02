@@ -1,0 +1,220 @@
+.appShell {
+  min-height: 100vh;
+  background: #0b0f14;
+  color: rgba(255, 255, 255, 0.9);
+  display: flex;
+  flex-direction: column;
+}
+
+.appHeader {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: rgba(11, 15, 20, 0.9);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.appHeaderInner {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 16px 20px;
+}
+
+.appTitle {
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+
+.appSubtitle {
+  margin-top: 4px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.appMain {
+  width: 100%;
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 16px 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  flex: 1;
+}
+
+.uploadPanel {
+  background: #0f1620;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 12px;
+}
+
+.uploadRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.uploadInput {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.uploadButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 9px 12px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  user-select: none;
+}
+
+.primaryButton {
+  padding: 9px 12px;
+  border-radius: 12px;
+  background: #10a37f;
+  border: 1px solid rgba(16, 163, 127, 0.4);
+  color: white;
+}
+
+.primaryButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.uploadMeta {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.65);
+  flex: 1;
+  min-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.uploadStatus {
+  margin-top: 10px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.chatPanel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  background: #0c1118;
+  overflow: hidden;
+}
+
+.messages {
+  flex: 1;
+  padding: 18px 16px;
+  overflow: auto;
+}
+
+.emptyState {
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 14px;
+  line-height: 1.4;
+  padding: 28px 10px;
+}
+
+.messageRow {
+  display: flex;
+  margin: 10px 0;
+}
+
+.messageRow.isUser {
+  justify-content: flex-end;
+}
+
+.messageRow.isAi {
+  justify-content: flex-start;
+}
+
+.messageBubble {
+  max-width: min(680px, 90%);
+  padding: 10px 12px;
+  border-radius: 14px;
+  font-size: 14px;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.messageRow.isUser .messageBubble {
+  background: #10a37f;
+  color: #08130f;
+  border: 1px solid rgba(16, 163, 127, 0.35);
+}
+
+.messageRow.isAi .messageBubble {
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.messageBubble.isTyping {
+  opacity: 0.85;
+}
+
+.composer {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(11, 15, 20, 0.6);
+  padding: 12px;
+}
+
+.composerInner {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  padding: 10px;
+}
+
+.composerInput {
+  flex: 1;
+  resize: none;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 14px;
+  line-height: 1.4;
+  min-height: 22px;
+  max-height: 160px;
+}
+
+.sendButton {
+  padding: 9px 12px;
+  border-radius: 12px;
+  background: #1f2937;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.sendButton:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.composerHint {
+  margin-top: 8px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.55);
+  padding: 0 4px;
+}
