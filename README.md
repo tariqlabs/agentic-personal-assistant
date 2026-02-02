@@ -38,7 +38,7 @@ A full-stack agentic RAG (Retrieval-Augmented Generation) application that allow
 1. **Clone the repository**
    ```bash
    git clone <repository-url>
-   cd agentic-rag-video
+   cd agentic-personal-assistant
    ```
 
 2. **Install dependencies**
@@ -86,7 +86,7 @@ npm run dev:client
 ## 📁 Project Structure
 
 ```
-agentic-rag-video/
+agentic-personal-assistant/
 ├── server/                 # Backend API server
 │   ├── index.js           # Express server and API routes
 │   ├── agent.js           # Agent logic and memory management
