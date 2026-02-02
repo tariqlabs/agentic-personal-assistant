@@ -1,0 +1,15 @@
+{
+  "name": "agentic-rag-video",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "concurrently -n server,client -c red,cyan \"npm --prefix server run dev\" \"npm --prefix client run dev\"",
+    "dev:server": "npm --prefix server run dev",
+    "dev:client": "npm --prefix client run dev",
+    "lint": "npm --prefix server run lint:fix && npm --prefix client run lint:fix && npm --prefix server run format && npm --prefix client run format",
+    "install:all": "npm install && npm --prefix server install --legacy-peer-deps && npm --prefix client install --legacy-peer-deps"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.0"
+  }
+}
