@@ -34,14 +34,13 @@ const getVectorStore = async () => {
   return vectorStore;
 };
 
-// Define the Search Tool using modern langchain 1.x API
 export const searchKnowledgeBase = tool(
   async ({ query }) => {
     console.log(`🔍 Agent is searching Pinecone for: "${query}"`);
 
     const store = await getVectorStore();
 
-    // We fetch the top 3 most similar chunks
+    // We fetch the top 10 most similar chunks
     const results = await store.similaritySearch(query, 10);
 
     // For demo purposes

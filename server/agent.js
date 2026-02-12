@@ -24,7 +24,7 @@ export async function runAgent({ sessionId = "default", message }) {
 
     console.log(`🤖 Running agent for: "${message}"`);
 
-    // Invoke the agent with proper message format
+    // Invoke here has an agentic behavior and it will decide to use the tool or not.
     const response = await agent.invoke(
       {
         messages: [{ role: "user", content: message }],
