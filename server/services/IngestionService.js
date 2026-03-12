@@ -8,7 +8,9 @@ export class IngestionService {
     this.vectorRepository = vectorRepository;
   }
 
-  async ingestFile(filePath) {
+  /** @param {string} filePath - Path to the PDF file */
+  /** @param {string} userId - User ID for per-user namespace isolation */
+  async ingestFile(filePath, userId) {
     const loader = new PDFLoader(filePath);
     const docs = await loader.load();
 
@@ -19,9 +21,10 @@ export class IngestionService {
     });
     const chunks = await splitter.splitDocuments(docs);
 
+    const namespace = userId ? String(userId) : undefined;
     for (let i = 0; i < chunks.length; i += batchSize) {
       const batch = chunks.slice(i, i + batchSize);
-      await this.vectorRepository.addDocuments(batch);
+      await this.vectorRepository.addDocuments(batch, namespace);
     }
 
     console.log("✅ Ingestion Complete!");

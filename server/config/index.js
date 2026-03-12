@@ -4,10 +4,18 @@ export const config = {
   server: {
     port: process.env.PORT || 3000,
   },
-  gemenai: {
-    apiKey: process.env.GEMENI_API_KEY,
-    model: "gemini-2.5-flash",
-    temperature: 0,
+  llm: {
+    provider: "openrouter",
+    apiKey: process.env.OPENROUTER_API_KEY,
+    model: process.env.OPENROUTER_MODEL || "qwen/qwen-2.5-32b-instruct",
+    examModel:
+      process.env.OPENROUTER_EXAM_MODEL ||
+      "nvidia/nemotron-3-nano-30b-a3b:free",
+    questionsModel:
+      process.env.OPENROUTER_QUESTIONS_MODEL ||
+      process.env.OPENROUTER_MODEL ||
+      "qwen/qwen-2.5-32b-instruct",
+    temperature: Number(process.env.OPENROUTER_TEMPERATURE ?? 0.2),
   },
   pinecone: {
     apiKey: process.env.PINECONE_API_KEY,
@@ -29,5 +37,11 @@ export const config = {
     chunkSize: 1000,
     chunkOverlap: 200,
     batchSize: 96,
+  },
+  jwt: {
+    accessSecret: process.env.JWT_ACCESS_SECRET || "dev-access-secret",
+    refreshSecret: process.env.JWT_REFRESH_SECRET || "dev-refresh-secret",
+    accessExpiresIn: process.env.JWT_ACCESS_EXPIRES_IN || "15m",
+    refreshExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN || "7d",
   },
 };

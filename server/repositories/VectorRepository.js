@@ -34,13 +34,17 @@ export class VectorRepository {
     return this.vectorStore;
   }
 
-  async search(query, limit = 10) {
+  /** @param {string} [namespace] - User namespace for isolation (e.g. user_${userId}) */
+  async search(query, limit = 10, namespace) {
     const store = await this.getVectorStore();
-    return await store.similaritySearch(query, limit);
+    const filter = namespace ? { namespace: `user_${namespace}` } : undefined;
+    return await store.similaritySearch(query, limit, filter);
   }
 
-  async addDocuments(documents) {
+  /** @param {string} [namespace] - User namespace for isolation (e.g. userId or user_${userId}) */
+  async addDocuments(documents, namespace) {
     const store = await this.getVectorStore();
-    return await store.addDocuments(documents);
+    const ns = namespace ? `user_${namespace}` : undefined;
+    return await store.addDocuments(documents, ns ? { namespace: ns } : undefined);
   }
 }

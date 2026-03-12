@@ -1,95 +1,58 @@
-import { useEffect, useRef, useState } from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider, useAuth } from "./shared/hooks/useAuth.jsx";
+import { LoginPage } from "./features/auth/LoginPage.jsx";
+import { SignupPage } from "./features/auth/SignupPage.jsx";
+import { VerifyPage } from "./features/auth/VerifyPage.jsx";
+import { ForgotPasswordPage } from "./features/auth/ForgotPasswordPage.jsx";
+import { ResetPasswordPage } from "./features/auth/ResetPasswordPage.jsx";
+import { AppLayout } from "./layout/AppLayout.jsx";
+import { ChatLayout } from "./features/chat/ChatLayout.jsx";
+import { ExamSetupPage } from "./features/exam/ExamSetupPage.jsx";
+import { ExamPage } from "./features/exam/ExamPage.jsx";
+import { HomePage } from "./features/home/HomePage.jsx";
 import "./App.css";
-import Header from "./Components/Header";
-import Upload from "./Components/Upload";
-import ChatPanel from "./Components/ChatPanel";
-import { getquestion, send } from "./apis/sendmessage";
 
+function ProtectedRoute({ children }) {
+  const { user, loading } = useAuth();
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-900">
+        <p className="text-slate-400">Loading…</p>
+      </div>
+    );
+  }
+  if (!user) return <Navigate to="/auth/login" replace />;
+  return children;
+}
 
-function App() {
-  const [input, setInput] = useState("");
-  const [messages, setMessages] = useState([]);
-  const [loading, setLoading] = useState(false);
-
-
-  const endOfMessagesRef = useRef(null);
-
-  useEffect(() => {
-    endOfMessagesRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, loading]);
-
-  const sendMessage = async () => {
-    const trimmed = input.trim();
-    if (!trimmed || loading) return;
-
-    setLoading(true);
-    setInput("");
-    setMessages((prev) => [...prev, { role: "user", text: trimmed }]);
-
-    try {
-      const response = await send(trimmed);
-
-      const data = await response.json().catch(() => ({}));
-
-      if (!response.ok) {
-        throw new Error(data?.error || "Chat request failed");
-      }
-
-      setMessages((prev) => [...prev, { role: "ai", text: data.answer }]);
-    } catch (err) {
-      setMessages((prev) => [...prev, { role: "ai", text: err?.message ?? "Chat request failed" }]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-    const askquestion = async() =>{
-    const trimmed = input.trim();
-
-    setLoading(true);
-    try {
-      const response = await getquestion(trimmed);
-
-      const data = await response.json().catch(() => ({}));
-
-      if (!response.ok) {
-        throw new Error(data?.error || "Chat request failed");
-      }
-
-      setMessages((prev) => [...prev, { role: "ai", text: data.answer }]);
-    } catch (err) {
-      setMessages((prev) => [...prev, { role: "ai", text: err?.message ?? "Chat request failed" }]);
-    } finally {
-      setLoading(false);
-    }
-
-    };
-
-  const onComposerKeyDown = (e) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage();
-    }
-  };
-
+function AppRoutes() {
   return (
-    <div className="appShell">
-      <Header />
-      <main className="appMain">
-        <Upload />
-        <ChatPanel
-          messages={messages}
-          loading={loading}
-          input={input}
-          setInput={setInput}
-          askquestion={askquestion}
-          sendMessage={sendMessage}
-          onComposerKeyDown={onComposerKeyDown}
-          endOfMessagesRef={endOfMessagesRef}
-        />
-      </main>
-    </div>
+    <Routes>
+      <Route path="/auth/login" element={<LoginPage />} />
+      <Route path="/auth/signup" element={<SignupPage />} />
+      <Route path="/auth/verify" element={<VerifyPage />} />
+      <Route path="/auth/forgot-password" element={<ForgotPasswordPage />} />
+      <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
+      <Route
+        path="/app"
+        element={<ProtectedRoute><AppLayout /></ProtectedRoute>}
+      >
+        <Route index element={<ChatLayout />} />
+        <Route path="exam" element={<ExamSetupPage />} />
+        <Route path="exam/:id" element={<ExamPage />} />
+      </Route>
+      <Route path="/" element={<HomePage />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   );
 }
 
-export default App;
+export default function App() {
+  return (
+    <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+      <AuthProvider>
+        <AppRoutes />
+      </AuthProvider>
+    </BrowserRouter>
+  );
+}

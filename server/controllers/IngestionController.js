@@ -12,7 +12,11 @@ export class IngestionController {
         return res.status(400).json({ error: "Missing file" });
       }
 
-      await ingestionService.ingestFile(req.file.path);
+      const userId = req.userId;
+      if (!userId) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
+      await ingestionService.ingestFile(req.file.path, userId);
       await unlink(req.file.path).catch(() => undefined);
 
       return res.json({ ok: true });

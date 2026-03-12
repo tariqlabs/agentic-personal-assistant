@@ -3,20 +3,15 @@
   "private": true,
   "version": "1.0.0",
   "scripts": {
-    "dev":  "npm --prefix server run dev"  ,  
-    "dev:server": "npm --prefix server run dev",
-    "dev:client": "npm --prefix client run dev",
-    "deploy": "npm run deploy:docker-build && npm run deploy:stop-container && npm run deploy:remove-container && npm run deploy:start-container"
-,
-    "lint": "npm --prefix server run lint:fix && npm --prefix client run lint:fix && npm --prefix server run format && npm --prefix client run format",
-    "install:all": "npm install && npm --prefix server install --legacy-peer-deps && npm --prefix client install --legacy-peer-deps"
+    "dev": "concurrently \"npm run dev:legacy-server\" \"npm run dev:legacy-client\"",
+    "dev:legacy-server": "npm --prefix server run dev",
+    "dev:legacy-client": "npm --prefix client run dev",
+    "lint": "npm --prefix server run lint:fix && npm --prefix client run lint:fix",
+    "show-designs": "node scripts/show-designs.mjs",
+    "install:all": "npm install && npm --prefix server install --legacy-peer-deps && npm --prefix client install"
   },
   "devDependencies": {
+    "@playwright/test": "^1.58.2",
     "concurrently": "^9.2.0"
-  },
-  "dependencies": {
-    "@langchain/core": "^1.1.31",
-    "@langchain/google-genai": "^2.1.24",
-    "dotenv": "^17.3.1"
   }
 }

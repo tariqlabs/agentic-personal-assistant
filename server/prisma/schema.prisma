@@ -1,0 +1,132 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  isVerified Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  conversations Conversation[]
+  verificationTokens EmailVerificationToken[]
+  resetTokens        PasswordResetToken[]
+  exams             Exam[]
+  examAttempts      ExamAttempt[]
+}
+
+model EmailVerificationToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  expiresAt DateTime
+  usedAt    DateTime?
+
+  createdAt DateTime @default(now())
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  expiresAt DateTime
+  usedAt    DateTime?
+
+  createdAt DateTime @default(now())
+}
+
+model Conversation {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  title     String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  messages  Message[]
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  conversationId String
+
+  role    String
+  content String
+
+  createdAt DateTime @default(now())
+}
+
+model Exam {
+  id         String   @id @default(cuid())
+  user       User     @relation(fields: [userId], references: [id])
+  userId     String
+  title      String   // e.g. "AWS Exam"
+  status     String   @default("draft") // draft | in_progress | completed
+  completedAt DateTime?
+
+  createdAt DateTime @default(now())
+
+  questions ExamQuestion[]
+  attempts  ExamAttempt[]
+}
+
+model ExamQuestion {
+  id              String   @id @default(cuid())
+  exam            Exam     @relation(fields: [examId], references: [id])
+  examId          String
+  questionText    String
+  options         Json     // [{ id, text }]
+  correctOptionId String
+  orderIndex      Int      @default(0)
+
+  createdAt DateTime @default(now())
+
+  answers UserExamAnswer[]
+}
+
+model ExamAttempt {
+  id             String   @id @default(cuid())
+  exam           Exam     @relation(fields: [examId], references: [id])
+  examId         String
+  user           User     @relation(fields: [userId], references: [id])
+  userId         String
+  score          Int?
+  totalQuestions Int
+  correctCount   Int
+  startedAt      DateTime @default(now())
+  completedAt    DateTime?
+
+  answers UserExamAnswer[]
+}
+
+model UserExamAnswer {
+  id               String      @id @default(cuid())
+  examAttempt      ExamAttempt @relation(fields: [examAttemptId], references: [id])
+  examAttemptId    String
+  examQuestion     ExamQuestion @relation(fields: [examQuestionId], references: [id])
+  examQuestionId   String
+  selectedOptionId String
+  isCorrect        Boolean
+  answeredAt       DateTime    @default(now())
+}
+
+model News {
+  id          String    @id @default(cuid())
+  title       String
+  content     String
+  publishedAt DateTime?
+  createdAt   DateTime  @default(now())
+}
+
