@@ -1,0 +1,39 @@
+{
+  "name": "apps-server",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Express API for agentic RAG app (OpenRouter Qwen, Postgres, Pinecone).",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "NODE_ENV=development node src/index.js",
+    "start": "NODE_ENV=production node dist/index.js",
+    "build": "echo \"TODO: add build step (e.g. Babel/TS)\"",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write \"**/*.{js,json,md}\"",
+    "format:check": "prettier --check \"**/*.{js,json,md}\""
+  },
+  "dependencies": {
+    "@langchain/community": "^1.0.11",
+    "@langchain/core": "^1.1.31",
+    "@langchain/langgraph": "^1.1.4",
+    "@langchain/langgraph-checkpoint": "^1.0.0",
+    "@langchain/pinecone": "^1.0.1",
+    "@langchain/textsplitters": "^0.1.0",
+    "@pinecone-database/pinecone": "^5.1.2",
+    "cors": "^2.8.6",
+    "dotenv": "^17.3.1",
+    "express": "^4.18.2",
+    "express-rate-limit": "^8.2.1",
+    "multer": "^2.0.0",
+    "pdf-parse": "^1.1.1",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.17.0",
+    "eslint": "^9.17.0",
+    "globals": "^15.14.0",
+    "prettier": "^3.4.2"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "name": "shared",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Shared types and utilities between web and server.",
+  "main": "index.js",
+  "type": "module"
+}

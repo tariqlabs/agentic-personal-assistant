@@ -1,0 +1,13 @@
+# Dependencies
+node_modules
+# Build artifacts
+dist
+.nx/cache
+# Version control
+.git
+# IDE/OS files
+.idea
+.vscode
+.DS_Store
+# Logs
+*.log
