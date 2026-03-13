@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { chatApi } from "./api/chatApi.js";
 import MessageList from "./components/MessageList.jsx";
 import Composer from "./components/Composer.jsx";
@@ -16,11 +16,28 @@ export function ChatLayout() {
   const [conversations, setConversations] = useState([]);
   const [activeId, setActiveId] = useState(null);
   const [messages, setMessages] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [loadingForId, setLoadingForId] = useState(null);
   const [input, setInput] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [, tick] = useState(0);
   const endOfMessagesRef = useRef(null);
+  const activeIdRef = useRef(null);
+  const pendingRef = useRef(new Set());
+
+  const isPending = useCallback((id) => pendingRef.current.has(id), []);
+
+  function addPending(id) {
+    pendingRef.current.add(id);
+    tick((n) => n + 1);
+  }
+
+  function removePending(id) {
+    pendingRef.current.delete(id);
+    tick((n) => n + 1);
+  }
+
+  useEffect(() => {
+    activeIdRef.current = activeId;
+  }, [activeId]);
 
   useEffect(() => { loadConversations(); }, []);
 
@@ -35,7 +52,7 @@ export function ChatLayout() {
 
   useEffect(() => {
     endOfMessagesRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, loading, loadingForId, activeId]);
+  }, [messages, activeId]);
 
   async function loadConversations() {
     try {
@@ -56,6 +73,7 @@ export function ChatLayout() {
       const res = await chatApi.getMessages(id);
       if (!res.ok) return;
       const data = await res.json();
+      if (activeIdRef.current !== id) return;
       setMessages(data.map((m) => ({ role: m.role === "assistant" ? "ai" : m.role, text: m.content })));
     } catch { setMessages([]); }
   }
@@ -86,7 +104,7 @@ export function ChatLayout() {
 
   async function sendMessage() {
     const trimmed = input.trim();
-    if (!trimmed || loading) return;
+    if (!trimmed || isPending(activeId)) return;
     let convId = activeId;
     if (!convId) {
       const res = await chatApi.createConversation();
@@ -96,40 +114,51 @@ export function ChatLayout() {
       setConversations((prev) => [conv, ...prev]);
       setActiveId(convId);
     }
-    setLoading(true);
-    setLoadingForId(convId);
+    addPending(convId);
     setInput("");
     setMessages((prev) => [...prev, { role: "user", text: trimmed }]);
     try {
       const res = await chatApi.sendMessage(convId, trimmed);
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || "Failed");
-      setMessages((prev) => [...prev, { role: "ai", text: data.answer }]);
+      if (activeIdRef.current === convId) {
+        setMessages((prev) => [...prev, { role: "ai", text: data.answer }]);
+      }
       if (data.title) {
         setConversations((prev) => prev.map((c) => (c.id === convId ? { ...c, title: data.title } : c)));
       }
     } catch (err) {
-      setMessages((prev) => [...prev, { role: "ai", text: err?.message ?? "Failed" }]);
+      if (activeIdRef.current === convId) {
+        setMessages((prev) => [...prev, { role: "ai", text: err?.message ?? "Failed" }]);
+      }
     } finally {
-      setLoading(false);
-      setLoadingForId(null);
+      removePending(convId);
+      if (activeIdRef.current === convId) {
+        loadMessages(convId);
+      }
     }
   }
 
   async function askQuestions() {
-    if (!activeId || loading) return;
-    setLoading(true);
-    setLoadingForId(activeId);
+    if (!activeId || isPending(activeId)) return;
+    const convId = activeId;
+    addPending(convId);
     try {
-      const res = await chatApi.generateQuestions(activeId);
+      const res = await chatApi.generateQuestions(convId);
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || "Failed");
-      setMessages((prev) => [...prev, { role: "ai", text: data.answer || "" }]);
+      if (activeIdRef.current === convId) {
+        setMessages((prev) => [...prev, { role: "ai", text: data.answer || "" }]);
+      }
     } catch (err) {
-      setMessages((prev) => [...prev, { role: "ai", text: err?.message ?? "Failed" }]);
+      if (activeIdRef.current === convId) {
+        setMessages((prev) => [...prev, { role: "ai", text: err?.message ?? "Failed" }]);
+      }
     } finally {
-      setLoading(false);
-      setLoadingForId(null);
+      removePending(convId);
+      if (activeIdRef.current === convId) {
+        loadMessages(convId);
+      }
     }
   }
 
@@ -137,7 +166,7 @@ export function ChatLayout() {
     if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); }
   };
 
-  const showLoading = loading && activeId === loadingForId;
+  const showLoading = isPending(activeId);
 
   return (
     <div className="flex h-full overflow-hidden">
@@ -145,6 +174,7 @@ export function ChatLayout() {
         conversations={conversations}
         activeId={activeId}
         sidebarOpen={sidebarOpen}
+        pendingIds={pendingRef.current}
         onSelect={setActiveId}
         onCreate={createConversation}
         onDelete={deleteConversation}

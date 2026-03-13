@@ -1,9 +1,10 @@
-import { MessageSquare, Plus, Trash2 } from "lucide-react";
+import { MessageSquare, Plus, Trash2, Loader2 } from "lucide-react";
 
 export function ConversationSidebar({
   conversations,
   activeId,
   sidebarOpen,
+  pendingIds,
   onSelect,
   onCreate,
   onDelete,
@@ -30,31 +31,38 @@ export function ConversationSidebar({
             No conversations yet
           </p>
         )}
-        {conversations.map((c) => (
-          <div
-            key={c.id}
-            className={`group flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm text-left truncate transition-colors cursor-pointer ${
-              activeId === c.id
-                ? "bg-slate-800/60 text-slate-200"
-                : "text-slate-400 hover:text-white hover:bg-slate-800/40"
-            }`}
-            onClick={() => onSelect(c.id)}
-            role="button"
-            tabIndex={0}
-            onKeyDown={(e) => e.key === "Enter" && onSelect(c.id)}
-          >
-            <MessageSquare className="w-3.5 h-3.5 shrink-0 text-slate-400" />
-            <span className="truncate flex-1">{c.title || "New chat"}</span>
-            <button
-              type="button"
-              onClick={(e) => { e.stopPropagation(); onDelete(c.id); }}
-              className="shrink-0 p-1 rounded-md text-slate-500 hover:text-red-400 hover:bg-red-500/20 opacity-0 group-hover:opacity-100 transition-all"
-              aria-label="Delete chat"
+        {conversations.map((c) => {
+          const loading = pendingIds?.has(c.id);
+          return (
+            <div
+              key={c.id}
+              className={`group flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm text-left truncate transition-colors cursor-pointer ${
+                activeId === c.id
+                  ? "bg-slate-800/60 text-slate-200"
+                  : "text-slate-400 hover:text-white hover:bg-slate-800/40"
+              }`}
+              onClick={() => onSelect(c.id)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => e.key === "Enter" && onSelect(c.id)}
             >
-              <Trash2 className="w-3.5 h-3.5" />
-            </button>
-          </div>
-        ))}
+              {loading ? (
+                <Loader2 className="w-3.5 h-3.5 shrink-0 text-blue-400 animate-spin" />
+              ) : (
+                <MessageSquare className="w-3.5 h-3.5 shrink-0 text-slate-400" />
+              )}
+              <span className="truncate flex-1">{c.title || "New chat"}</span>
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); onDelete(c.id); }}
+                className="shrink-0 p-1 rounded-md text-slate-500 hover:text-red-400 hover:bg-red-500/20 opacity-0 group-hover:opacity-100 transition-all"
+                aria-label="Delete chat"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          );
+        })}
       </nav>
     </aside>
   );
